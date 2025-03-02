@@ -1,4 +1,4 @@
-import { NearBindgen, near, call, view, LookupMap, Vector } from "near-sdk-js";
+import { NearBindgen, near, LookupMap } from "near-sdk-js";
 
 @NearBindgen({})
 class NeuralTradeX {
@@ -14,18 +14,15 @@ class NeuralTradeX {
     this.tradeIndex = new LookupMap("tradeIndex");
   }
 
-  @call({})
   saveStrategy({ user, strategy }: { user: string; strategy: string }): string {
     this.strategies.set(user, strategy);
     return "Strategy saved successfully";
   }
 
-  @view({})
   getStrategy({ user }: { user: string }): string | null {
     return this.strategies.get(user) || null;
   }
 
-  @call({ payableFunction: true })
   deposit(): string {
     const user = near.predecessorAccountId();
     const amount = near.attachedDeposit().toString();
@@ -37,12 +34,10 @@ class NeuralTradeX {
     return newBalance;
   }
 
-  @view({})
   getBalance({ user }: { user: string }): string {
     return this.balances.get(user) || "0";
   }
 
-  @call({})
   executeTrade({
     user,
     tradeAction,
@@ -73,7 +68,6 @@ class NeuralTradeX {
     return `Trade executed: ${tradeAction} with ${amount} yoctoNEAR`;
   }
 
-  @view({})
   getTradeHistory({ user }: { user: string }): string[] {
     let index = this.tradeIndex.get(user) || "0";
     let trades = [];
