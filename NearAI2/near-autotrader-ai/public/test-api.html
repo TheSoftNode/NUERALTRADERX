@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEAR AutoTrader API Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #0072CE;
+    }
+    .section {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #0072CE;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background-color: #005DAC;
+    }
+    input, select {
+      padding: 8px;
+      margin: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 5px;
+      overflow: auto;
+      max-height: 300px;
+    }
+  </style>
+</head>
+<body>
+  <h1>NEAR AutoTrader API Test</h1>
+  
+  <div class="section">
+    <h2>Market Data</h2>
+    <div>
+      <label for="priceCoin">Coin:</label>
+      <input type="text" id="priceCoin" value="near">
+      <label for="priceDays">Days:</label>
+      <input type="number" id="priceDays" value="7" min="1" max="90">
+      <button onclick="fetchPriceData()">Get Price Data</button>
+    </div>
+    <pre id="priceResult">Results will appear here...</pre>
+  </div>
+  
+  <div class="section">
+    <h2>Create Market Making Agent</h2>
+    <div>
+      <label for="mmCoin">Coin:</label>
+      <input type="text" id="mmCoin" value="near">
+      <label for="mmUserId">User ID:</label>
+      <input type="text" id="mmUserId" value="test_user">
+      <label for="mmBuyThreshold">Buy Threshold (%):</label>
+      <input type="number" id="mmBuyThreshold" value="0.5" step="0.1" min="0.1">
+      <label for="mmSellThreshold">Sell Threshold (%):</label>
+      <input type="number" id="mmSellThreshold" value="1.0" step="0.1" min="0.1">
+      <button onclick="createMarketMakingAgent()">Create Agent</button>
+    </div>
+    <pre id="mmResult">Results will appear here...</pre>
+  </div>
+  
+  <div class="section">
+    <h2>Get Market Making Recommendation</h2>
+    <div>
+      <label for="mmAgentId">Agent ID:</label>
+      <input type="text" id="mmAgentId" placeholder="user_id_coin">
+      <button onclick="getMarketMakingRecommendation()">Get Recommendation</button>
+    </div>
+    <pre id="mmRecResult">Results will appear here...</pre>
+  </div>
+  
+  <div class="section">
+    <h2>Create DCA Agent</h2>
+    <div>
+      <label for="dcaCoin">Coin:</label>
+      <input type="text" id="dcaCoin" value="near">
+      <label for="dcaUserId">User ID:</label>
+      <input type="text" id="dcaUserId" value="test_user">
+      <label for="dcaAmount">Investment Amount ($):</label>
+      <input type="number" id="dcaAmount" value="100" min="1">
+      <label for="dcaFrequency">Frequency:</label>
+      <select id="dcaFrequency">
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+      </select>
+      <button onclick="createDCAAgent()">Create Agent</button>
+    </div>
+    <pre id="dcaResult">Results will appear here...</pre>
+  </div>
+  
+  <div class="section">
+    <h2>Simulate DCA Investment</h2>
+    <div>
+      <label for="dcaAgentId">Agent ID:</label>
+      <input type="text" id="dcaAgentId" placeholder="user_id_coin">
+      <button onclick="simulateDCAInvestment()">Simulate Investment</button>
+    </div>
+    <pre id="dcaInvestResult">Results will appear here...</pre>
+  </div>
+  
+  <div class="section">
+    <h2>Get DCA Performance</h2>
+    <div>
+      <label for="dcaPerfAgentId">Agent ID:</label>
+      <input type="text" id="dcaPerfAgentId" placeholder="user_id_coin">
+      <button onclick="getDCAPerformance()">Get Performance</button>
+    </div>
+    <pre id="dcaPerfResult">Results will appear here...</pre>
+  </div>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:3001/api';
+    
+    async function makeApiCall(url, method = 'GET', body = null) {
+      try {
+        const options = {
+          method,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        };
+        
+        if (body) {
+          options.body = JSON.stringify(body);
+        }
+        
+        const response = await fetch(url, options);
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('API Error:', error);
+        return { error: error.message };
+      }
+    }
+    
+    async function fetchPriceData() {
+      const coin = document.getElementById('priceCoin').value;
+      const days = document.getElementById('priceDays').value;
+      const resultElement = document.getElementById('priceResult');
+      
+      resultElement.textContent = 'Loading...';
+      
+      const data = await makeApiCall(`${API_BASE_URL}/market/price/${coin}?days=${days}`);
+      resultElement.textContent = JSON.stringify(data, null, 2);
+    }
+    
+    async function createMarketMakingAgent() {
+      const coin = document.getElementById('mmCoin').value;
+      const userId = document.getElementById('mmUserId').value;
+      const buyThreshold = parseFloat(document.getElementById('mmBuyThreshold').value) / 100;
+      const sellThreshold = parseFloat(document.getElementById('mmSellThreshold').value) / 100;
+      const resultElement = document.getElementById('mmResult');
+      
+      resultElement.textContent = 'Creating agent...';
+      
+      const data = await makeApiCall(`${API_BASE_URL}/agents/market-making`, 'POST', {
+        coin,
+        userId,
+        buyThreshold,
+        sellThreshold
+      });
+      
+      resultElement.textContent = JSON.stringify(data, null, 2);
+      
+      if (data.agentId) {
+        document.getElementById('mmAgentId').value = data.agentId;
+      }
+    }
+    
+    async function getMarketMakingRecommendation() {
+      const agentId = document.getElementById('mmAgentId').value;
+      const resultElement = document.getElementById('mmRecResult');
+      
+      if (!agentId) {
+        resultElement.textContent = 'Error: Agent ID is required';
+        return;
+      }
+      
+      resultElement.textContent = 'Loading...';
+      
+      const data = await makeApiCall(`${API_BASE_URL}/agents/market-making/${agentId}/recommendation`);
+      resultElement.textContent = JSON.stringify(data, null, 2);
+    }
+    
+    async function createDCAAgent() {
+      const coin = document.getElementById('dcaCoin').value;
+      const userId = document.getElementById('dcaUserId').value;
+      const investmentAmount = parseFloat(document.getElementById('dcaAmount').value);
+      const frequency = document.getElementById('dcaFrequency').value;
+      const resultElement = document.getElementById('dcaResult');
+      
+      resultElement.textContent = 'Creating agent...';
+      
+      const data = await makeApiCall(`${API_BASE_URL}/agents/dca`, 'POST', {
+        coin,
+        userId,
+        investmentAmount,
+        frequency
+      });
+      
+      resultElement.textContent = JSON.stringify(data, null, 2);
+      
+      if (data.agentId) {
+        document.getElementById('dcaAgentId').value = data.agentId;
+        document.getElementById('dcaPerfAgentId').value = data.agentId;
+      }
+    }
+    
+    async function simulateDCAInvestment() {
+      const agentId = document.getElementById('dcaAgentId').value;
+      const resultElement = document.getElementById('dcaInvestResult');
+      
+      if (!agentId) {
+        resultElement.textContent = 'Error: Agent ID is required';
+        return;
+      }
+      
+      resultElement.textContent = 'Simulating investment...';
+      
+      const data = await makeApiCall(`${API_BASE_URL}/agents/dca/${agentId}/invest`, 'POST');
+      resultElement.textContent = JSON.stringify(data, null, 2);
+    }
+    
+    async function getDCAPerformance() {
+      const agentId = document.getElementById('dcaPerfAgentId').value;
+      const resultElement = document.getElementById('dcaPerfResult');
+      
+      if (!agentId) {
+        resultElement.textContent = 'Error: Agent ID is required';
+        return;
+      }
+      
+      resultElement.textContent = 'Loading...';
+      
+      const data = await makeApiCall(`${API_BASE_URL}/agents/dca/${agentId}/performance`);
+      resultElement.textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
