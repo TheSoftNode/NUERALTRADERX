@@ -7,6 +7,7 @@ import { Play, ArrowDown, TrendingUp, BrainCircuit, BarChart2 } from 'lucide-rea
 import WalletButton from '@/near-setup/WalletButton';
 import HeroDashboard from './HeroDashboard';
 import HeroAnimation from './HeroAnimation';
+import HeroDashboard2 from './HeroDashboard2';
 
 const HeroSection = () => {
     const { scrollYProgress } = useScroll();
@@ -311,8 +312,8 @@ const HeroSection = () => {
                         transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1.0], delay: 0.3 }}
                     >
                         <div className="relative h-[450px] md:h-[500px] lg:h-[600px]">
-
-                            <HeroDashboard />
+                            <HeroAnimation />
+                            {/* <HeroDashboard2 /> */}
                         </div>
                     </motion.div>
                 </div>
