@@ -42,11 +42,6 @@ const HeroDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [mounted, setMounted] = useState(false);
 
-    // At the top of your component
-    if (!mounted) {
-        return null; // Return nothing during SSR
-    }
-
     // Animation controls
     const controls = useAnimation();
     const panelControls = useAnimation();
@@ -55,20 +50,14 @@ const HeroDashboard = () => {
         setMounted(true);
         console.log("HeroDashboard mounted");
 
-        let controller: AbortController | null = null;
-        let timeoutId: NodeJS.Timeout | null = null;
-
-
         // Function to fetch real crypto data from CoinGecko
         const fetchCryptoData = async () => {
             try {
-                controller = new AbortController();
-                timeoutId = setTimeout(() => controller?.abort(), 5000);
                 // Try to get real time data from CoinGecko API
                 try {
                     const response = await fetch(
                         'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=near&order=market_cap_desc&per_page=1&page=1&sparkline=true&price_change_percentage=24h',
-                        { signal: controller.signal } // Timeout after 5 seconds
+                        { signal: AbortSignal.timeout(5000) } // Timeout after 5 seconds
                     );
 
                     if (!response.ok) {
@@ -182,12 +171,9 @@ const HeroDashboard = () => {
         window.addEventListener('resize', handleResize);
 
         return () => {
-            if (controller) controller.abort();
-            if (timeoutId) clearTimeout(timeoutId);
             window.removeEventListener('resize', handleResize);
         };
     }, [controls, panelControls]);
-
 
     // Set up a second useEffect to handle cases where the ref might be ready later
     useEffect(() => {
