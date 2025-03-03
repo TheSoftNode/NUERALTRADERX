@@ -25,6 +25,17 @@ const HeroDashboard = () => {
     const controls = useAnimation();
     const panelControls = useAnimation();
 
+    // Mock chart data
+    const chartData = [
+        { price: 3.2, timestamp: Date.now() - 7 * 24 * 3600 * 1000 },
+        { price: 3.5, timestamp: Date.now() - 6 * 24 * 3600 * 1000 },
+        { price: 3.4, timestamp: Date.now() - 5 * 24 * 3600 * 1000 },
+        { price: 3.6, timestamp: Date.now() - 4 * 24 * 3600 * 1000 },
+        { price: 3.8, timestamp: Date.now() - 3 * 24 * 3600 * 1000 },
+        { price: 3.7, timestamp: Date.now() - 2 * 24 * 3600 * 1000 },
+        { price: 3.9, timestamp: Date.now() - 1 * 24 * 3600 * 1000 },
+    ];
+
     useEffect(() => {
         setMounted(true);
         console.log("HeroDashboard mounted");
@@ -37,6 +48,20 @@ const HeroDashboard = () => {
 
         fetchData();
     }, []);
+
+    // Scale functions for chart
+    const scaleX = (index: number): number => {
+        const width = 500; // Fixed width for the chart
+        return (index * width) / (chartData.length - 1);
+    };
+
+    const scaleY = (price: number): number => {
+        const minPrice = Math.min(...chartData.map(d => d.price));
+        const maxPrice = Math.max(...chartData.map(d => d.price));
+        const range = maxPrice - minPrice;
+        const height = 160; // Fixed height for the chart
+        return height - ((price - minPrice) / range) * height;
+    };
 
     if (!mounted || loading) {
         return (
@@ -150,7 +175,7 @@ const HeroDashboard = () => {
 
                                 {/* Placeholder line */}
                                 <motion.path
-                                    d="M 0 80 L 100 40 L 200 120 L 300 80 L 400 40 L 500 120"
+                                    d={chartData.map((point, index) => `${index === 0 ? 'M' : 'L'} ${scaleX(index)} ${scaleY(point.price)}`).join(' ')}
                                     fill="none"
                                     stroke="#10B981"
                                     strokeWidth="2"
@@ -161,7 +186,7 @@ const HeroDashboard = () => {
 
                                 {/* Placeholder gradient area */}
                                 <motion.path
-                                    d="M 0 80 L 100 40 L 200 120 L 300 80 L 400 40 L 500 120 L 500 160 L 0 160 Z"
+                                    d={`${chartData.map((point, index) => `${index === 0 ? 'M' : 'L'} ${scaleX(index)} ${scaleY(point.price)}`).join(' ')} L 500 160 L 0 160 Z`}
                                     fill="url(#placeholder-gradient)"
                                     opacity="0.2"
                                     initial={{ opacity: 0 }}
