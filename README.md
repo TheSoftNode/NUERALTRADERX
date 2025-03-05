@@ -1,8 +1,9 @@
 # Neural-TRADEX Trading Platform
 Neural-TRADEX is an AI automated trading platform that leverages artificial intelligence to analyze cryptocurrency markets and execute trading strategies on the NEAR blockchain. The platform offers two primary trading strategies:
 
-Market Making Agent - Uses AI price predictions to buy low and sell high
-Dollar-Cost Averaging (DCA) Agent - Automates regular investments at set intervals
+** Market Making Agent** - Uses AI price predictions to buy low and sell high
+
+** Dollar-Cost Averaging (DCA) Agent** - Automates regular investments at set intervals
 
 
 ## Market Making Agent
@@ -40,7 +41,7 @@ The platform provides several API endpoints to interact with the Market Making A
 
 ```javascript
 // Example: Creating a new Market Making Agent
-const response = await fetch('/api/agents/market-making', {
+const response = await fetch('/api/agents/market-making-agent', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -81,6 +82,26 @@ The DCA strategy is designed to reduce the impact of volatility on cryptocurrenc
    - Optional maximum price thresholds
 
 
+## DCA Agent API Integration
+The platform provides several API endpoints to interact with the DCA Agent:
+```
+// Example: Creating a new DCA Agent
+const response = await fetch('/api/agents/dca', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    coin: 'NEAR',
+    investmentAmount: 50,
+    interval: 'weekly',
+    dayOfWeek: 'monday'
+  })
+});
+
+// Example: Getting performance summary
+const performance = await fetch(
+  `/api/agents/dca/${agentId}/performance`
+);
+```
 
 ## Comparing the Agents
 
