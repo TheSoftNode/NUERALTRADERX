@@ -86,7 +86,7 @@ const Navbar = () => {
     const scrolledBgClass = theme === 'dark'
         ? 'bg-gradient-to-r from-gray-900/95 via-gray-900/95 to-gray-900/95 border-b border-gray-800/30 shadow-lg shadow-indigo-900/5'
         // ? 'bg-gradient-to-r from-gray-900/95 via-gray-900/95 to-gray-900/95 backdrop-blur-lg border-b border-gray-800/30 shadow-lg shadow-indigo-900/5'
-        : 'bg-gradient-to-r from-white/95 via-white/95 to-white/95 backdrop-blur-lg border-b border-gray-200/30 shadow-sm shadow-indigo-100/20';
+        : 'bg-gradient-to-r from-white/95 via-white/95 to-white/95  border-b border-gray-200/30 shadow-sm shadow-indigo-100/20';
 
     // Dynamic classes based on theme and scroll state
     const navbarClasses = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? scrolledBgClass : 'bg-transparent'}`;
